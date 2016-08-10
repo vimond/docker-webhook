@@ -1,6 +1,8 @@
 [Webhook](https://github.com/adnanh/webhook/) Dockerized
 =================
 
+[![](https://images.microbadger.com/badges/image/almir/webhook.svg)](http://microbadger.com/images/almir/webhook "Get your own image badge on microbadger.com")
+
 ## Running webhook in Docker
 The simplest usage of [almir/webhook](https://hub.docker.com/r/almir/webhook/) image is for one to host the hooks JSON file on their machine and mount the directory in which those are kept as a volume to the Docker container:
 ```shell
