@@ -6,11 +6,15 @@ SCRIPTPATH=$(readlink -f "$(dirname "$(readlink -f ${0})")")
 # Get stript's name
 SCRIPTNAME=$(basename ${0})
 
+# Get the branch currently used
+CURBRANCH=$(git rev-parse --abbrev-ref HEAD)
+
 check_and_update() {
   # Get inside the git repo directory
   cd ${SCRIPTPATH}/.. || exit
   # Get latest updates to the repo
-  git reset --hard && git pull
+  git fetch --all && \
+  git reset --hard origin/${CURBRANCH}
 
   # Get latest release of webhook and release used in this repo
   LATEST_RELEASE=$(curl -s https://api.github.com/repos/adnanh/webhook/releases/latest | grep tag_name | awk -F ': "' '{ print $2 }' | awk -F '",' '{ print $1 }')
@@ -20,10 +24,10 @@ check_and_update() {
   if [[ "${LOCAL_RELEASE}" != "${LATEST_RELEASE}" ]] && [[ -n ${LATEST_RELEASE} ]]; then
     sed -i "s/WEBHOOK_VERSION ${LOCAL_RELEASE}/WEBHOOK_VERSION ${LATEST_RELEASE}/g" ${SCRIPTPATH}/../Dockerfile
     git commit -am "- bump webhook version to ${LATEST_RELEASE}"
-    git push origin master && \
+    git push origin ${CURBRANCH} && \
     curl -s -X POST -H "Content-Type: application/json" \
-      -d '{"tag_name":"'"${LATEST_RELEASE}"'","target_commitish":"master","name":"webhook '"${LATEST_RELEASE}"'","body":"Release for webhook version '"${LATEST_RELEASE}"'.","draft":false,"prerelease":false}' \
-      https://${GITHUB_USER}:${GITHUB_PASS}@api.github.com/repos/almir/docker-webhook/releases
+      -d '{"tag_name":"'${LATEST_RELEASE}'","target_commitish":"'${CURBRANCH}'","name":"webhook '${LATEST_RELEASE}'","body":"Release for webhook version '${LATEST_RELEASE}'.","draft":false,"prerelease":false}' \
+      https://${GITHUB_USER}:${GITHUB_PASS}@api.github.com/repos/${GITHUB_USER}/docker-webhook/releases
   fi
 }
 
