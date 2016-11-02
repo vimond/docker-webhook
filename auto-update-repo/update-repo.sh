@@ -20,7 +20,7 @@ check_and_update() {
   if [[ "${LOCAL_RELEASE}" != "${LATEST_RELEASE}" ]] && [[ -n ${LATEST_RELEASE} ]]; then
     sed -i "s/WEBHOOK_VERSION ${LOCAL_RELEASE}/WEBHOOK_VERSION ${LATEST_RELEASE}/g" ${SCRIPTPATH}/../Dockerfile
     git commit -am "- bump webhook version to ${LATEST_RELEASE}"
-    git push origin master
+    git push origin master && \
     curl -s -X POST -H "Content-Type: application/json" \
       -d '{"tag_name":"'"${LATEST_RELEASE}"'","target_commitish":"master","name":"webhook '"${LATEST_RELEASE}"'","body":"Release for webhook version '"${LATEST_RELEASE}"'.","draft":false,"prerelease":false}' \
       https://${GITHUB_USER}:${GITHUB_PASS}@api.github.com/repos/almir/docker-webhook/releases
