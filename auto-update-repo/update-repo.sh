@@ -6,12 +6,11 @@ SCRIPTPATH=$(readlink -f "$(dirname "$(readlink -f ${0})")")
 # Get stript's name
 SCRIPTNAME=$(basename ${0})
 
-# Get the branch currently used
-CURBRANCH=$(git rev-parse --abbrev-ref HEAD)
-
 check_and_update() {
   # Get inside the git repo directory
   cd ${SCRIPTPATH}/.. || exit
+  # Get the branch currently used
+  CURBRANCH=$(git rev-parse --abbrev-ref HEAD)
   # Get latest updates to the repo
   git fetch --all && \
   git reset --hard origin/${CURBRANCH}
