@@ -6,7 +6,7 @@ MAINTAINER  Almir Dzinovic <almirdzin@gmail.com>
 
 ENV         GOPATH /go
 ENV         SRCPATH ${GOPATH}/src/github.com/adnanh
-ENV         WEBHOOK_VERSION 2.6.3
+ENV         WEBHOOK_VERSION 2.6.4
 
 RUN         apk add --update -t build-deps curl go git libc-dev gcc libgcc && \
             git config --global http.https://gopkg.in.followRedirects true && \
