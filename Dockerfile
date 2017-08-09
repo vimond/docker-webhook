@@ -1,6 +1,6 @@
 # Dockerfile for https://github.com/adnanh/webhook
 
-FROM        alpine
+FROM        alpine:3.6
 
 MAINTAINER  Almir Dzinovic <almirdzin@gmail.com>
 
