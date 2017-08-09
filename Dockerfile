@@ -9,7 +9,6 @@ ENV         SRCPATH ${GOPATH}/src/github.com/adnanh
 ENV         WEBHOOK_VERSION 2.6.5
 
 RUN         apk add --update -t build-deps curl go git libc-dev gcc libgcc && \
-            git config --global http.https://gopkg.in.followRedirects true && \
             curl -L -o /tmp/webhook-${WEBHOOK_VERSION}.tar.gz https://github.com/adnanh/webhook/archive/${WEBHOOK_VERSION}.tar.gz && \
             mkdir -p ${SRCPATH} && tar -xvzf /tmp/webhook-${WEBHOOK_VERSION}.tar.gz -C ${SRCPATH} && \
             mv -f ${SRCPATH}/webhook-* ${SRCPATH}/webhook && \
