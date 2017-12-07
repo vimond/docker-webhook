@@ -13,9 +13,14 @@ test:
 
 
 deployment:
-  artifactory:
+  untagged:
     branch: master
     commands:
       - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
       - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
       - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
+  tagged: 
+    tags: /.*/
+    commands:
+      - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
+      - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
