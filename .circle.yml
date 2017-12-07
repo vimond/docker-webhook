@@ -1,0 +1,21 @@
+machine:
+  services:
+    - docker
+  environment:
+    IMAGE_NAME: docker-webhook
+test:
+  override:
+    - docker build --rm=false -t $IMAGE_NAME:$CIRCLE_BUILD_NUM .
+    - docker login -u $ARTIFACTORY_USER -p $ARTIFACTORY_PASSWORD -e developers@vimond.com $DOCKER_PRIVATE_REPO
+    - docker tag -f $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
+    - docker tag -f $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
+    - docker tag -f $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
+
+
+deployment:
+  artifactory:
+    branch: master
+    commands:
+      - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
+      - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
+      - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
