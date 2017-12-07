@@ -20,7 +20,7 @@ deployment:
       - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
       - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
   tagged: 
-    tags: /.*/
+    tag: /.*/
     commands:
       - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
       - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
