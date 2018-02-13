@@ -1,6 +1,10 @@
 [Webhook](https://github.com/adnanh/webhook/) Dockerized
 =================
 
+Modified for Vimond
+-------------------
+* Added curl support in the image to create a hook that calls a webhook (very meta). Used by prometheus alertmanager.
+
 [![](https://images.microbadger.com/badges/image/almir/webhook.svg)](http://microbadger.com/images/almir/webhook "Get your own image badge on microbadger.com")
 [![ghit.me](https://ghit.me/badge.svg?repo=almir/docker-webhook)](https://ghit.me/repo/almir/docker-webhook)
 
