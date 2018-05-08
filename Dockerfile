@@ -1,22 +1,18 @@
 # Dockerfile for https://github.com/adnanh/webhook
-
-FROM        alpine:3.6
-
+FROM        golang:alpine3.7 AS build
 MAINTAINER  Almir Dzinovic <almirdzin@gmail.com>
-
-ENV         GOPATH /go
-ENV         SRCPATH ${GOPATH}/src/github.com/adnanh
+WORKDIR     /go/src/github.com/adnanh/webhook
 ENV         WEBHOOK_VERSION 2.6.8
-
-RUN         apk add --update -t build-deps curl go git libc-dev gcc libgcc && \
-            curl -L -o /tmp/webhook-${WEBHOOK_VERSION}.tar.gz https://github.com/adnanh/webhook/archive/${WEBHOOK_VERSION}.tar.gz && \
-            mkdir -p ${SRCPATH} && tar -xvzf /tmp/webhook-${WEBHOOK_VERSION}.tar.gz -C ${SRCPATH} && \
-            mv -f ${SRCPATH}/webhook-* ${SRCPATH}/webhook && \
-            cd ${SRCPATH}/webhook && go get -d && go build -o /usr/local/bin/webhook && \
+RUN         apk add --update -t build-deps curl libc-dev gcc libgcc
+RUN         curl -L --silent -o webhook.tar.gz https://github.com/adnanh/webhook/archive/${WEBHOOK_VERSION}.tar.gz && \
+            tar -xzf webhook.tar.gz --strip 1 &&  \
+            go get -d && \
+            go build -o /usr/local/bin/webhook && \
             apk del --purge build-deps && \
             rm -rf /var/cache/apk/* && \
-            rm -rf ${GOPATH}
+            rm -rf /go
 
+FROM        alpine:3.7
+COPY        --from=build /usr/local/bin/webhook /usr/local/bin/webhook
 EXPOSE      9000
-
 ENTRYPOINT  ["/usr/local/bin/webhook"]
