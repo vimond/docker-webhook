@@ -14,7 +14,5 @@ RUN         curl -L --silent -o webhook.tar.gz https://github.com/adnanh/webhook
 
 FROM        alpine:3.7
 COPY        --from=build /usr/local/bin/webhook /usr/local/bin/webhook
-COPY        hooks.json.example /etc/webhook/hooks.json
 EXPOSE      9000
 ENTRYPOINT  ["/usr/local/bin/webhook"]
-CMD         ["-verbose", "-hooks=/etc/webhook/hooks.json", "-hotreload"]
