@@ -37,8 +37,13 @@ workflows:
             branches:
               only:
                 - "master"
-                - "feature/circle-2.0"
-      - build:
-          filters:
+                #- "feature/circle-2.0"
             tags:
-              only: /.*/
+              only:
+                - "/.*/"
+#      - build:
+#          filters:
+#            tags:
+#              only: /.*/
+#            branches:
+#              ignores: /.*/
