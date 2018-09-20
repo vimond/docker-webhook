@@ -7,6 +7,7 @@ jobs:
           IMAGE_NAME: docker-webhook
     steps:
     - setup_remote_docker
+    - checkout
     - run:
         name: Build docker image
         command: |
