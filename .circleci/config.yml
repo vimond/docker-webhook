@@ -108,7 +108,7 @@ workflows:
           - build
           filters:
             branches:
-              ignores: /.*/
+              ignore: /.*/
             tags:
               only:
               - "/.*/"
