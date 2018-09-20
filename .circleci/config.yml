@@ -31,5 +31,3 @@ workflows:
                 only:
                   - master
                   - feature/circle-2.0
-              tags:
-                only: /.*/
