@@ -59,34 +59,34 @@ jobs:
           docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
           docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
 
-upload_tagged:
-  #working_directory: /tmp/docker-webhook
-  docker:
-  - image: circleci/golang:1.11-stretch-node
-    environment:
-      IMAGE_NAME: docker-webhook
-  steps:
-  - checkout
-  - attach_workspace:
-      at: tmp
-  - setup_remote_docker
-  - run:
-      name: Load docker image
-      command: |
-        docker load -i tmp/image.tar
-  - run:
-      name: Login to artifactory
-      command: |
-        echo "$ARTIFACTORY_PASSWORD" | docker login -u $ARTIFACTORY_USER --password-stdin $DOCKER_PRIVATE_REPO
+  upload_tagged:
+    #working_directory: /tmp/docker-webhook
+    docker:
+    - image: circleci/golang:1.11-stretch-node
+      environment:
+        IMAGE_NAME: docker-webhook
+    steps:
+    - checkout
+    - attach_workspace:
+        at: tmp
+    - setup_remote_docker
+    - run:
+        name: Load docker image
+        command: |
+          docker load -i tmp/image.tar
+    - run:
+        name: Login to artifactory
+        command: |
+          echo "$ARTIFACTORY_PASSWORD" | docker login -u $ARTIFACTORY_USER --password-stdin $DOCKER_PRIVATE_REPO
 
-  - run:
-      name: Tag image
-      command: |
-        docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
-  - run:
-      name: Push images
-      command: |
-        docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
+    - run:
+        name: Tag image
+        command: |
+          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
+    - run:
+        name: Push images
+        command: |
+          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
 
 
 
