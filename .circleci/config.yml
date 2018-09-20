@@ -26,7 +26,19 @@ jobs:
           - image.tar
 
 
-
+  upload:
+    #working_directory: /tmp/docker-webhook
+    docker:
+    - image: circleci/golang:1.11-stretch-node
+      environment:
+        IMAGE_NAME: docker-webhook
+    - attach_workspace:
+        at: .
+    - setup_remote_docker
+    - run:
+        name: Load docker image
+        command: |
+          docker load -i image.tar
     - run:
         name: Login to artifactory
         command: |
@@ -52,15 +64,18 @@ workflows:
   version: 2
   build_and_upload:
     jobs:
-      - build:
+      - build
+      - upload:
+          requires:
+            - build
           filters:
             branches:
               only:
                 - "master"
                 - "feature/circle-2.0"
-            tags:
-              only:
-                - "/.*/"
+#            tags:
+#              only:
+#                - "/.*/"
 #      - build:
 #          filters:
 #            tags:
