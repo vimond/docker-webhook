@@ -13,7 +13,15 @@ jobs:
         name: Build docker image
         command: |
           docker build --rm=false -t $IMAGE_NAME:$CIRCLE_BUILD_NUM .
+
+    - run:
+        name: Login to artifactory
+        command: |
           echo "$ARTIFACTORY_PASSWORD" | docker login -u $ARTIFACTORY_USER --password-stdin $DOCKER_PRIVATE_REPO
+
+    - run:
+        name: Tag image
+        command: |
           docker tag $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
           docker tag $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
           docker tag $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
