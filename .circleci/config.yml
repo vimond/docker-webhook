@@ -17,7 +17,7 @@ jobs:
     - run:
         name: Export docker image
         command: |
-          docker save -o /tmp/image.tar
+          docker save -o /tmp/image.tar $IMAGE_NAME:$CIRCLE_BUILD_NUM
 
     - persist_to_workspace:
         name: Store docker image
