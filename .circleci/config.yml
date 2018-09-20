@@ -33,14 +33,14 @@ jobs:
       environment:
         IMAGE_NAME: docker-webhook
     steps:
-    - attach_workspace:
-        at: .
-    - setup_remote_docker
     - checkout
+    - attach_workspace:
+        at: tmp
+    - setup_remote_docker
     - run:
         name: Load docker image
         command: |
-          docker load -i image.tar
+          docker load -i tmp/image.tar
     - run:
         name: Login to artifactory
         command: |
