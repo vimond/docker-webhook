@@ -107,6 +107,8 @@ workflows:
           requires:
           - build
           filters:
+            branches:
+              ignores: /.*/
             tags:
               only:
               - "/.*/"
