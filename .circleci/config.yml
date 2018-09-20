@@ -32,6 +32,7 @@ jobs:
     - image: circleci/golang:1.11-stretch-node
       environment:
         IMAGE_NAME: docker-webhook
+    steps:
     - attach_workspace:
         at: .
     - setup_remote_docker
