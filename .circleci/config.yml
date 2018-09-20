@@ -12,12 +12,12 @@ jobs:
     - run:
         name: Build docker image
         command: |
-          docker build --rm=false -t $IMAGE_NAME:$CIRCLE_BUILD_NUM .
+          docker build --rm=false -t docker-webhook:build .
 
     - run:
         name: Export docker image
         command: |
-          docker save -o /tmp/image.tar $IMAGE_NAME:$CIRCLE_BUILD_NUM
+          docker save -o /tmp/image.tar docker-webhook:build
 
     - persist_to_workspace:
         name: Store docker image
@@ -48,15 +48,15 @@ jobs:
     - run:
         name: Tag image
         command: |
-          docker tag $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
-          docker tag $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
-          docker tag $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
+          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
+          #docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
+          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
     - run:
         name: Push images
         command: |
-          - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
-          - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
-          - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
+          #docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
+          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
+          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
 
 
 
