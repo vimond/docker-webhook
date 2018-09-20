@@ -15,6 +15,19 @@ jobs:
           docker build --rm=false -t $IMAGE_NAME:$CIRCLE_BUILD_NUM .
 
     - run:
+        name: Export docker image
+        command: |
+          docker save -o /tmp/image.tar
+
+    - persist_to_workspace:
+        name: Store docker image
+        root: /tmp
+        paths:
+          - image.tar
+
+
+
+    - run:
         name: Login to artifactory
         command: |
           echo "$ARTIFACTORY_PASSWORD" | docker login -u $ARTIFACTORY_USER --password-stdin $DOCKER_PRIVATE_REPO
@@ -25,6 +38,13 @@ jobs:
           docker tag $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
           docker tag $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
           docker tag $IMAGE_NAME:$CIRCLE_BUILD_NUM $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
+    - run:
+        name: Push images
+        command: |
+          - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
+          - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
+          - docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
+
 
 
 
@@ -37,7 +57,7 @@ workflows:
             branches:
               only:
                 - "master"
-                #- "feature/circle-2.0"
+                - "feature/circle-2.0"
             tags:
               only:
                 - "/.*/"
