@@ -104,7 +104,7 @@ workflows:
               only:
                 - "master"
                 - "feature/circle-2.0"
-      - upload:
+      - upload_tagged:
           requires:
           - build
           filters:
