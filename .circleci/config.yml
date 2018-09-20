@@ -103,14 +103,10 @@ workflows:
             branches:
               only:
                 - "master"
-                - "feature/circle-2.0"
       - upload_tagged:
           requires:
           - build
           filters:
-            branches:
-              only:
-              - "master"
             tags:
               only:
               - "/.*/"
