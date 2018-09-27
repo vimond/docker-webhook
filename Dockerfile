@@ -13,6 +13,8 @@ RUN         curl -L --silent -o webhook.tar.gz https://github.com/adnanh/webhook
             rm -rf /go
 
 FROM        alpine:3.7
+RUN         apk --update add curl openssl ca-certificates && \
+            rm -rf /var/cache/apk/*
 COPY        --from=build /usr/local/bin/webhook /usr/local/bin/webhook
 EXPOSE      9000
 ENTRYPOINT  ["/usr/local/bin/webhook"]
