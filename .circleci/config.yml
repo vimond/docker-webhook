@@ -101,7 +101,7 @@ workflows:
             - build
           filters:
             branches:
-              - master
+              only: master
       - push_tagged:
           requires:
             - build
