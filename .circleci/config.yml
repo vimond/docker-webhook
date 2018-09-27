@@ -109,4 +109,4 @@ workflows:
             tags:
               only: /.*/
             branches:
-              ignores: /.*/
+              ignore: /.*/
