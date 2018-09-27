@@ -1,7 +1,6 @@
 version: 2
 jobs:
   build:
-    #working_directory: /tmp/docker-webhook
     docker:
       - image: circleci/golang:1.11-stretch-node
         environment:
@@ -13,6 +12,66 @@ jobs:
         name: Build docker image
         command: |
           docker build --rm=false -t docker-webhook:build .
+    - run:
+        name: Export docker image
+        command: |
+          docker save -o /tmp/image.tar docker-webhook:build
+
+    - run:
+        name: Store git revision data
+        command: |
+          git rev-parse --verify  HEAD > /tmp/git-rev-parse.txt
+          git describe --tags --always > /tmp/git-rev-tags.txt
+
+    - persist_to_workspace:
+        name: Store docker image
+        root: /tmp
+        paths:
+        - image.tar
+        - git-rev-parse.txt
+        - git-rev-tags.txt
+
+  push_latest:
+    docker:
+    - image: circleci/golang:1.11-stretch-node
+      environment:
+        IMAGE_NAME: docker-webhook
+    steps:
+    - setup_remote_docker
+    - run:
+        name: Load docker image
+        command: |
+          docker load -i tmp/image.tar
+
+    - run:
+        name: Login to artifactory
+        command: |
+          echo "$ARTIFACTORY_PASSWORD" | docker login -u $ARTIFACTORY_USER --password-stdin $DOCKER_PRIVATE_REPO
+
+
+    - run:
+        name: Tag image
+        command: |
+          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
+          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat /tmp/git-rev-parse.txt)
+
+    - run:
+        name: Push images
+        command: |
+          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat /tmp/git-rev-parse.txt)
+          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
+
+  push_tagged:
+    docker:
+    - image: circleci/golang:1.11-stretch-node
+      environment:
+        IMAGE_NAME: docker-webhook
+    steps:
+    - setup_remote_docker
+    - run:
+        name: Load docker image
+        command: |
+          docker load -i tmp/image.tar
 
     - run:
         name: Login to artifactory
@@ -22,17 +81,12 @@ jobs:
     - run:
         name: Tag image
         command: |
-          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
-          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
-          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
+          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat /tmp/git-rev-tags.txt)
 
     - run:
         name: Push images
         command: |
-          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git describe --tags --always)
-          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(git rev-parse --verify  HEAD)
-          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
-
+          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat /tmp/git-rev-tags.txt)
 
 workflows:
   version: 2
@@ -40,9 +94,19 @@ workflows:
     jobs:
       - build:
           filters:
-            branches:
-              only:
-                - "master"
             tags:
-              only:
-                - "/.*/"
+              only: /.*/
+      - push_latest:
+          requires:
+            - build
+          filters:
+            branches:
+              - master
+      - push_tagged:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignores: /.*/
