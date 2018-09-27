@@ -22,6 +22,8 @@ jobs:
         command: |
           git rev-parse --verify  HEAD > /tmp/git-rev-parse.txt
           git describe --tags --always > /tmp/git-rev-tags.txt
+          echo rev-parse: $(cat /tmp/git-rev-parse.txt)
+          echo describe: $(cat /tmp/git-rev-tags.txt)
 
     - persist_to_workspace:
         name: Store docker image
@@ -38,6 +40,8 @@ jobs:
         IMAGE_NAME: docker-webhook
     steps:
     - setup_remote_docker
+    - attach_workspace:
+        at: tmp
     - run:
         name: Load docker image
         command: |
@@ -68,6 +72,8 @@ jobs:
         IMAGE_NAME: docker-webhook
     steps:
     - setup_remote_docker
+    - attach_workspace:
+        at: tmp
     - run:
         name: Load docker image
         command: |
