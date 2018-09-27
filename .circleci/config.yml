@@ -57,12 +57,12 @@ jobs:
         name: Tag image
         command: |
           docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
-          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat /tmp/git-rev-parse.txt)
+          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat tmp/git-rev-parse.txt)
 
     - run:
         name: Push images
         command: |
-          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat /tmp/git-rev-parse.txt)
+          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat tmp/git-rev-parse.txt)
           docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
 
   push_tagged:
@@ -87,12 +87,12 @@ jobs:
     - run:
         name: Tag image
         command: |
-          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat /tmp/git-rev-tags.txt)
+          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat tmp/git-rev-tags.txt)
 
     - run:
         name: Push images
         command: |
-          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat /tmp/git-rev-tags.txt)
+          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat tmp/git-rev-tags.txt)
 
 workflows:
   version: 2
