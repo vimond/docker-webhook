@@ -49,7 +49,9 @@ jobs:
         command: |
           docker load -i tmp/image.tar
 
-    - checkout
+    - checkout:
+        path: repo
+
 
     - run:
         name: Install the AWS CLI
@@ -60,7 +62,7 @@ jobs:
           ls -al ../
 
           ls -al tmp/
-          pip install -r .circleci/requirements.txt
+          pip install -r repo/.circleci/requirements.txt
 
     - run:
         name: Docker login
@@ -91,14 +93,16 @@ jobs:
     - attach_workspace:
         at: tmp
 
-    - checkout
+    - checkout:
+        path: repo
+
 
     - run:
         name: Install the AWS CLI
         command: |
           python3 -m venv venv
           . venv/bin/activate
-          pip install -r .circleci/requirements.txt
+          pip install -r repo/.circleci/requirements.txt
 
     - run:
         name: Load docker image
