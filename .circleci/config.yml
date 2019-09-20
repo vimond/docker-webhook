@@ -35,7 +35,7 @@ jobs:
 
   push_latest:
     docker:
-    - image: circleci/golang:1.11-stretch-node
+    - image: circleci/python:3.6.1
       environment:
         IMAGE_NAME: docker-webhook
     steps:
@@ -48,22 +48,29 @@ jobs:
           docker load -i tmp/image.tar
 
     - run:
-        name: Login to artifactory
+        name: Install the AWS CLI
         command: |
-          echo "$ARTIFACTORY_PASSWORD" | docker login -u $ARTIFACTORY_USER --password-stdin $DOCKER_PRIVATE_REPO
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -r .circleci/requirements.txt
 
+    - run:
+        name: Docker login
+        command: |
+          . venv/bin/activate
+          eval $(AWS_ACCESS_KEY_ID=$ECR_AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$ECR_AWS_SECRET_ACCESS_KEY  aws ecr get-login --region $ECR_AWS_REGION --no-include-email)
 
     - run:
         name: Tag image
         command: |
-          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
-          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat tmp/git-rev-parse.txt)
+          docker tag docker-webhook:build $AWS_DOCKER_REGISTRY/$IMAGE_NAME:latest
+          docker tag docker-webhook:build $AWS_DOCKER_REGISTRY/$IMAGE_NAME:$(cat tmp/git-rev-parse.txt)
 
     - run:
         name: Push images
         command: |
-          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat tmp/git-rev-parse.txt)
-          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:latest
+          docker push $AWS_DOCKER_REGISTRY/$IMAGE_NAME:$(cat tmp/git-rev-parse.txt)
+          docker push $AWS_DOCKER_REGISTRY/$IMAGE_NAME:latest
 
   push_tagged:
     docker:
