@@ -58,10 +58,6 @@ jobs:
         command: |
           python3 -m venv venv
           . venv/bin/activate
-          ls -al
-          ls -al ../
-
-          ls -al tmp/
           pip install -r repo/.circleci/requirements.txt
 
     - run:
