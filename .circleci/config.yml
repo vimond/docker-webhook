@@ -91,12 +91,14 @@ jobs:
     - attach_workspace:
         at: tmp
 
+    - checkout
+
     - run:
         name: Install the AWS CLI
         command: |
           python3 -m venv venv
           . venv/bin/activate
-          pip install -r ~/.circleci/requirements.txt
+          pip install -r .circleci/requirements.txt
 
     - run:
         name: Load docker image
