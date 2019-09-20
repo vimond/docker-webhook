@@ -67,32 +67,41 @@ jobs:
 
   push_tagged:
     docker:
-    - image: circleci/golang:1.11-stretch-node
+    - image: circleci/python:3.6.1
       environment:
         IMAGE_NAME: docker-webhook
     steps:
     - setup_remote_docker
     - attach_workspace:
         at: tmp
+
+    - run:
+        name: Install the AWS CLI
+        command: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -r .circleci/requirements.txt
+
     - run:
         name: Load docker image
         command: |
           docker load -i tmp/image.tar
 
     - run:
-        name: Login to artifactory
+        name: Docker login
         command: |
-          echo "$ARTIFACTORY_PASSWORD" | docker login -u $ARTIFACTORY_USER --password-stdin $DOCKER_PRIVATE_REPO
+          . venv/bin/activate
+          eval $(AWS_ACCESS_KEY_ID=$ECR_AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$ECR_AWS_SECRET_ACCESS_KEY  aws ecr get-login --region $ECR_AWS_REGION --no-include-email)
 
     - run:
         name: Tag image
         command: |
-          docker tag docker-webhook:build $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat tmp/git-rev-tags.txt)
+          docker tag docker-webhook:build $AWS_DOCKER_REGISTRY/$IMAGE_NAME:$(cat tmp/git-rev-tags.txt)
 
     - run:
         name: Push images
         command: |
-          docker push $DOCKER_PRIVATE_REPO/$IMAGE_NAME:$(cat tmp/git-rev-tags.txt)
+          docker push $AWS_DOCKER_REGISTRY/$IMAGE_NAME:$(cat tmp/git-rev-tags.txt)
 
 workflows:
   version: 2
