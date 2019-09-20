@@ -49,6 +49,8 @@ jobs:
         command: |
           docker load -i tmp/image.tar
 
+    - checkout
+
     - run:
         name: Install the AWS CLI
         command: |
@@ -56,8 +58,9 @@ jobs:
           . venv/bin/activate
           ls -al
           ls -al ../
+
           ls -al tmp/
-          pip install -r ~/.circleci/requirements.txt
+          pip install -r .circleci/requirements.txt
 
     - run:
         name: Docker login
