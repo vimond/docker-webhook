@@ -1,6 +1,7 @@
 version: 2
 jobs:
   build:
+    working_directory: ~/docker-webhook
     docker:
       - image: circleci/golang:1.11-stretch-node
         environment:
@@ -34,6 +35,7 @@ jobs:
         - git-rev-tags.txt
 
   push_latest:
+    working_directory: ~/docker-webhook
     docker:
     - image: circleci/python:3.6.1
       environment:
@@ -53,6 +55,8 @@ jobs:
           python3 -m venv venv
           . venv/bin/activate
           ls
+          ls ../
+          ls tmp/
           pip install -r ~/.circleci/requirements.txt
 
     - run:
@@ -74,6 +78,7 @@ jobs:
           docker push $AWS_DOCKER_REGISTRY/$IMAGE_NAME:latest
 
   push_tagged:
+    working_directory: ~/docker-webhook
     docker:
     - image: circleci/python:3.6.1
       environment:
