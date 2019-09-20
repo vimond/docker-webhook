@@ -52,7 +52,8 @@ jobs:
         command: |
           python3 -m venv venv
           . venv/bin/activate
-          pip install -r .circleci/requirements.txt
+          ls
+          pip install -r ~/.circleci/requirements.txt
 
     - run:
         name: Docker login
@@ -87,7 +88,7 @@ jobs:
         command: |
           python3 -m venv venv
           . venv/bin/activate
-          pip install -r .circleci/requirements.txt
+          pip install -r ~/.circleci/requirements.txt
 
     - run:
         name: Load docker image
